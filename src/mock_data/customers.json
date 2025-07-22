@@ -1,0 +1,56 @@
+{
+  "customers": [
+    {
+      "customer_id": "WM001",
+      "name": "Priya Sharma",
+      "email": "priya.sharma@gmail.com",
+      "phone": "+91-9876543210",
+      "wallet_balance": 0.00,
+      "membership": "Walmart+",
+      "location": "Mumbai, Maharashtra",
+      "join_date": "2023-05-15",
+      "recent_orders": ["ORD001", "ORD002"],
+      "total_spent": 1480.00,
+      "preferred_language": "English"
+    },
+    {
+      "customer_id": "WM002",
+      "name": "Rahul Gupta",
+      "email": "rahul.gupta@gmail.com",
+      "phone": "+91-9876543211",
+      "wallet_balance": 150.00,
+      "membership": "Regular",
+      "location": "Delhi, NCR",
+      "join_date": "2023-08-20",
+      "recent_orders": ["ORD003", "ORD004"],
+      "total_spent": 9748.00,
+      "preferred_language": "Hindi"
+    },
+    {
+      "customer_id": "WM003",
+      "name": "Sneha Patel",
+      "email": "sneha.patel@yahoo.com",
+      "phone": "+91-9876543212",
+      "wallet_balance": 45075.50,
+      "membership": "Walmart+",
+      "location": "Bangalore, Karnataka",
+      "join_date": "2023-03-10",
+      "recent_orders": ["ORD005", "ORD007"],
+      "total_spent": 1500.00,
+      "preferred_language": "English"
+    },
+    {
+      "customer_id": "WM004",
+      "name": "Amit Kumar",
+      "email": "amit.kumar@outlook.com",
+      "phone": "+91-9876543213",
+      "wallet_balance": 0.00,
+      "membership": "Regular",
+      "location": "Pune, Maharashtra",
+      "join_date": "2023-11-05",
+      "recent_orders": ["ORD006"],
+      "total_spent": 2198.00,
+      "preferred_language": "English"
+    }
+  ]
+}

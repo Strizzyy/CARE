@@ -1,0 +1,17 @@
+{
+  "escalations": {
+    "0e0ad6f4-f02f-472d-9b35-84e9bc47b60e": {
+      "customer_id": "WM003",
+      "issue_details": "I want a refund for ORD005 because the laptop was damaged.",
+      "status": "resolved",
+      "escalation_time": "2025-07-14T14:56:04.425901",
+      "resolution_details": "Refund of ₹45000.00 already processed on 2024-07-12 (PAY005)."
+    },
+    "3926e56c-f183-4d4a-9061-16a89be23bf8": {
+      "customer_id": "WM003",
+      "issue_details": "I want a refund for ORD007 because the glassware set was damaged.",
+      "status": "pending",
+      "escalation_time": "2025-07-14T15:03:16.010748"
+    }
+  }
+}

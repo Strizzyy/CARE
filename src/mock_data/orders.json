@@ -1,0 +1,123 @@
+{
+  "orders": [
+    {
+      "order_id": "ORD001",
+      "customer_id": "WM001",
+      "status": "delivered",
+      "order_date": "2024-07-10",
+      "delivery_date": "2024-07-12",
+      "expected_delivery": "2024-07-12",
+      "items": [
+        {"name": "Basmati Rice Fortune 5kg", "price": 450.00, "quantity": 1, "category": "Groceries"},
+        {"name": "Fortune Sunflower Oil 1L", "price": 180.00, "quantity": 2, "category": "Groceries"},
+        {"name": "Tide Detergent 1kg", "price": 250.00, "quantity": 1, "category": "Household"}
+      ],
+      "total_amount": 1060.00,
+      "payment_method": "wallet",
+      "delivery_address": "Flat 302, Shanti Apartments, Andheri East, Mumbai - 400069",
+      "tracking_id": "TRK001",
+      "delivery_partner": "Walmart Spark"
+    },
+    {
+      "order_id": "ORD002",
+      "customer_id": "WM001",
+      "status": "pending",
+      "order_date": "2024-07-13",
+      "delivery_date": null,
+      "expected_delivery": "2024-07-15",
+      "items": [
+        {"name": "Fresh Vegetables Bundle", "price": 300.00, "quantity": 1, "category": "Fresh"},
+        {"name": "Amul Milk 1L", "price": 60.00, "quantity": 2, "category": "Dairy"}
+      ],
+      "total_amount": 420.00,
+      "payment_method": "card",
+      "delivery_address": "Flat 302, Shanti Apartments, Andheri East, Mumbai - 400069",
+      "tracking_id": "TRK002",
+      "delivery_partner": "Walmart Spark"
+    },
+    {
+      "order_id": "ORD007",
+      "customer_id": "WM003",
+      "status": "delivered",
+      "order_date": "2024-07-12",
+      "delivery_date": "2024-07-14",
+      "expected_delivery": "2024-07-14",
+      "items": [
+        {"name": "Glassware Set", "price": 1500.00, "quantity": 1, "category": "Home"}
+      ],
+      "total_amount": 1500.00,
+      "payment_method": "wallet",
+      "delivery_address": "Apartment 5B, Tech Park Road, Bangalore - 560001",
+      "tracking_id": "TRK007",
+      "delivery_partner": "Walmart Spark",
+      "damage_reported": true
+    },
+    {
+      "order_id": "ORD003",
+      "customer_id": "WM002",
+      "status": "shipped",
+      "order_date": "2024-07-11",
+      "delivery_date": null,
+      "expected_delivery": "2024-07-14",
+      "items": [
+        {"name": "Samsung Galaxy Earbuds", "price": 8999.00, "quantity": 1, "category": "Electronics"},
+        {"name": "Phone Case", "price": 299.00, "quantity": 1, "category": "Accessories"}
+      ],
+      "total_amount": 9298.00,
+      "payment_method": "upi",
+      "delivery_address": "House No. 45, Sector 21, Gurgaon, Haryana - 122001",
+      "tracking_id": "TRK003",
+      "delivery_partner": "FedEx"
+    },
+    {
+      "order_id": "ORD004",
+      "customer_id": "WM002",
+      "status": "delivered",
+      "order_date": "2024-07-08",
+      "delivery_date": "2024-07-10",
+      "expected_delivery": "2024-07-10",
+      "items": [
+        {"name": "Britannia Biscuits Pack", "price": 150.00, "quantity": 3, "category": "Snacks"}
+      ],
+      "total_amount": 450.00,
+      "payment_method": "wallet",
+      "delivery_address": "House No. 45, Sector 21, Gurgaon, Haryana - 122001",
+      "tracking_id": "TRK004",
+      "delivery_partner": "Walmart Spark"
+    },
+    {
+      "order_id": "ORD005",
+      "customer_id": "WM003",
+      "status": "cancelled",
+      "order_date": "2024-07-12",
+      "delivery_date": null,
+      "expected_delivery": "2024-07-14",
+      "items": [
+        {"name": "Laptop HP Pavilion", "price": 45000.00, "quantity": 1, "category": "Electronics"}
+      ],
+      "total_amount": 45000.00,
+      "payment_method": "card",
+      "delivery_address": "Apartment 5B, Tech Park Road, Bangalore - 560001",
+      "tracking_id": "TRK005",
+      "delivery_partner": "BlueDart",
+      "cancellation_reason": "Customer requested cancellation"
+    },
+    {
+      "order_id": "ORD006",
+      "customer_id": "WM004",
+      "status": "processing",
+      "order_date": "2024-07-13",
+      "delivery_date": null,
+      "expected_delivery": "2024-07-16",
+      "items": [
+        {"name": "Yoga Mat", "price": 899.00, "quantity": 1, "category": "Fitness"},
+        {"name": "Protein Powder", "price": 1299.00, "quantity": 1, "category": "Health"}
+      ],
+      "total_amount": 2198.00,
+      "payment_method": "cod",
+      "delivery_address": "Shop No. 12, FC Road, Pune - 411005",
+      "tracking_id": "TRK006",
+      "delivery_partner": "Walmart Spark"
+    }
+  ]
+}   

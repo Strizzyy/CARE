@@ -1,0 +1,157 @@
+{
+  "subscriptions": [
+    {
+      "subscription_id": "SUB001",
+      "customer_id": "WM001",
+      "items": [
+        {
+          "name": "Amul Milk 1L",
+          "price": 60.0,
+          "quantity": 2,
+          "category": "Dairy"
+        }
+      ],
+      "delivery_day": "Monday",
+      "frequency": "weekly",
+      "next_delivery": "2025-08-04",
+      "status": "active",
+      "created_at": "2025-07-14T09:00:00Z"
+    },
+    {
+      "subscription_id": "SUB002",
+      "customer_id": "WM001",
+      "items": [
+        {
+          "name": "Whey Protein",
+          "price": 2000.0,
+          "quantity": 1,
+          "category": "Health"
+        }
+      ],
+      "delivery_day": "Friday",
+      "frequency": "weekly",
+      "next_delivery": "2025-08-01",
+      "status": "active",
+      "created_at": "2025-07-14T09:50:04.326694"
+    },
+    {
+      "subscription_id": "SUB003",
+      "customer_id": "WM001",
+      "items": [
+        {
+          "name": "Cadbury Chocolate",
+          "price": 60.0,
+          "quantity": 1,
+          "category": "Snacks"
+        }
+      ],
+      "delivery_day": "Thursday",
+      "frequency": "weekly",
+      "next_delivery": "2025-07-31",
+      "status": "active",
+      "created_at": "2025-07-14T09:52:52.046504"
+    },
+    {
+      "subscription_id": "SUB004",
+      "customer_id": "WM002",
+      "items": [
+        {
+          "name": "Amul Milk 1L",
+          "price": 90.0,
+          "quantity": 1,
+          "category": "Dairy"
+        }
+      ],
+      "delivery_day": "Tuesday",
+      "frequency": "weekly",
+      "next_delivery": "2025-07-29",
+      "status": "active",
+      "created_at": "2025-07-14T10:26:34.757028"
+    },
+    {
+      "subscription_id": "SUB005",
+      "customer_id": "WM002",
+      "items": [
+        {
+          "name": "Cadbury Chocolate",
+          "price": 900.0,
+          "quantity": 1,
+          "category": "Snacks"
+        }
+      ],
+      "delivery_day": "Wednesday",
+      "frequency": "weekly",
+      "next_delivery": "2025-07-30",
+      "status": "cancelled",
+      "created_at": "2025-07-14T10:28:01.381422"
+    },
+    {
+      "subscription_id": "SUB006",
+      "customer_id": "WM002",
+      "items": [
+        {
+          "name": "Amul Paneer",
+          "price": 100.0,
+          "quantity": 1,
+          "category": "Dairy"
+        }
+      ],
+      "delivery_day": "Wednesday",
+      "frequency": "weekly",
+      "next_delivery": "2025-07-30",
+      "status": "active",
+      "created_at": "2025-07-14T10:30:29.326336"
+    },
+    {
+      "subscription_id": "SUB007",
+      "customer_id": "WM001",
+      "items": [
+        {
+          "name": "Amul Milk 1L",
+          "price": 60.0,
+          "quantity": 1,
+          "category": "Dairy"
+        }
+      ],
+      "delivery_day": "Monday",
+      "frequency": "weekly",
+      "next_delivery": "2025-08-04",
+      "status": "active",
+      "created_at": "2025-07-14T13:48:31.687278"
+    },
+    {
+      "subscription_id": "SUB008",
+      "customer_id": "WM001",
+      "items": [
+        {
+          "name": "Amul Milk 1L",
+          "price": 60.0,
+          "quantity": 1,
+          "category": "Dairy"
+        }
+      ],
+      "delivery_day": "Monday",
+      "frequency": "weekly",
+      "next_delivery": "2025-08-04",
+      "status": "active",
+      "created_at": "2025-07-14T15:38:20.190896"
+    },
+    {
+      "subscription_id": "SUB009",
+      "customer_id": "WM001",
+      "items": [
+        {
+          "name": "Amul Milk 1L",
+          "price": 60.0,
+          "quantity": 1,
+          "category": "Dairy"
+        }
+      ],
+      "delivery_day": "Tuesday",
+      "frequency": "weekly",
+      "next_delivery": "2025-07-29",
+      "status": "active",
+      "created_at": "2025-07-14T15:38:42.160632"
+    }
+  ]
+}

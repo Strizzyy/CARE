@@ -1,0 +1,85 @@
+{
+  "payments": [
+    {
+      "payment_id": "PAY001",
+      "customer_id": "WM001",
+      "order_id": "ORD001",
+      "amount": 1060.00,
+      "status": "completed",
+      "method": "wallet",
+      "timestamp": "2024-07-10T10:30:00Z",
+      "transaction_id": "TXN001",
+      "gateway": "Paytm"
+    },
+    {
+      "payment_id": "PAY002",
+      "customer_id": "WM001",
+      "order_id": "ORD002",
+      "amount": 420.00,
+      "status": "failed",
+      "method": "card",
+      "timestamp": "2024-07-13T14:20:00Z",
+      "transaction_id": "TXN002",
+      "gateway": "Razorpay",
+      "error": "Insufficient funds in card"
+    },
+    {
+      "payment_id": "PAY003",
+      "customer_id": "WM002",
+      "order_id": "ORD003",
+      "amount": 9298.00,
+      "status": "completed",
+      "method": "upi",
+      "timestamp": "2024-07-11T09:15:00Z",
+      "transaction_id": "TXN003",
+      "gateway": "PhonePe"
+    },
+    {
+      "payment_id": "PAY007",
+      "customer_id": "WM004",
+      "order_id": "ORD006",
+      "amount": 2198.00,
+      "status": "failed",
+      "method": "cod",
+      "timestamp": "2024-07-13T13:25:00Z",
+      "transaction_id": "TXN007",
+      "gateway": "Cash on Delivery",
+      "error": "Payment not processed"
+    },
+    {
+      "payment_id": "PAY004",
+      "customer_id": "WM002",
+      "order_id": "ORD004",
+      "amount": 450.00,
+      "status": "completed",
+      "method": "wallet",
+      "timestamp": "2024-07-08T16:45:00Z",
+      "transaction_id": "TXN004",
+      "gateway": "Walmart Wallet"
+    },
+    {
+      "payment_id": "PAY005",
+      "customer_id": "WM003",
+      "order_id": "ORD005",
+      "amount": 45000.00,
+      "status": "refunded",
+      "method": "card",
+      "timestamp": "2024-07-12T11:00:00Z",
+      "transaction_id": "TXN005",
+      "gateway": "Razorpay",
+      "refund_amount": 45000.00,
+      "refund_date": "2024-07-12T18:30:00Z"
+    },
+    {
+      "payment_id": "PAY006",
+      "customer_id": "WM004",
+      "order_id": "ORD006",
+      "amount": 2198.00,
+      "status": "pending",
+      "method": "cod",
+      "timestamp": "2024-07-13T13:22:00Z",
+      "transaction_id": "TXN006",
+      "gateway": "Cash on Delivery"
+    }
+  ]
+}
