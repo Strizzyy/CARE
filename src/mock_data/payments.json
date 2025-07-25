@@ -62,13 +62,11 @@
       "customer_id": "WM003",
       "order_id": "ORD005",
       "amount": 45000.00,
-      "status": "refunded",
+      "status": "completed",
       "method": "card",
       "timestamp": "2024-07-12T11:00:00Z",
       "transaction_id": "TXN005",
-      "gateway": "Razorpay",
-      "refund_amount": 45000.00,
-      "refund_date": "2024-07-12T18:30:00Z"
+      "gateway": "Razorpay"
     },
     {
       "payment_id": "PAY006",
@@ -80,6 +78,17 @@
       "timestamp": "2024-07-13T13:22:00Z",
       "transaction_id": "TXN006",
       "gateway": "Cash on Delivery"
+    },
+    {
+      "payment_id": "PAY008",
+      "customer_id": "WM003",
+      "order_id": "ORD007",
+      "amount": 1500.00,
+      "status": "completed",
+      "method": "wallet",
+      "timestamp": "2024-07-12T11:15:00Z",
+      "transaction_id": "TXN008",
+      "gateway": "Walmart Wallet"
     }
   ]
 }

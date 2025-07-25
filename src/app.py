@@ -283,7 +283,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
 # Initialize session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -334,31 +333,34 @@ def get_customer_info(customer_id):
         return None
 
 def send_message(message, customer_id, file=None):
-    """Send message to chat API with optional file upload"""
-    try:
-        if file:
-            logging.info(f"Sending message with file upload for customer {customer_id}.")
-            files = {'file': (file.name, file, file.type)}
-            data = {'message': message, 'customer_id': customer_id}
-            response = requests.post(f"{API_BASE_URL}/validate", files=files, data=data, timeout=45)
-            logging.info(f"Validation response status: {response.status_code}, response: {response.text}")
-            if response.status_code == 200:
-                logging.info(f"Received response: {response.json()}")  # Log the JSON response
-                return response.json()
-        else:
-            logging.info(f"Sending chat message for customer {customer_id}: {message}")
-            response = requests.post(f"{API_BASE_URL}/chat", json={"message": message, "customer_id": customer_id}, timeout=5)
-            if response.status_code in [200, 201]:
-                logging.info(f"Message sent successfully for customer {customer_id}.")
-                logging.info(f"Received response: {response.json()}")  # Log the JSON response
-                return response.json()
-        logging.error(f"Failed to send message: HTTP {response.status_code} - {response.text}")
-        st.error(f"Failed to send message: HTTP {response.status_code} - {response.text}")
-        return None
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Error sending message: {str(e)}")
-        st.error(f"Error sending message: {str(e)}")
-        return None
+       """Send message to chat API with optional file upload"""
+       try:
+           if file:
+               logging.info(f"Sending message with file upload for customer {customer_id}. File: {file.name}, type: {file.type}")
+               # Log first few bytes for debugging
+               initial_bytes = file.getvalue()[:10] if file else b""
+               logging.info(f"File initial bytes: {initial_bytes.hex()}")
+               files = {'file': (file.name, file.getvalue(), 'image/jpeg')}  # Force MIME type to image/jpeg
+               data = {'message': message or "Refund request with image", 'customer_id': customer_id}
+               response = requests.post(f"{API_BASE_URL}/validate", files=files, data=data, timeout=45)
+               logging.info(f"Validation response status: {response.status_code}, response: {response.text}")
+               if response.status_code == 200:
+                   logging.info(f"Received response: {response.json()}")
+                   return response.json()
+           else:
+               logging.info(f"Sending chat message for customer {customer_id}: {message}")
+               response = requests.post(f"{API_BASE_URL}/chat", json={"message": message, "customer_id": customer_id}, timeout=5)
+               if response.status_code in [200, 201]:
+                   logging.info(f"Message sent successfully for customer {customer_id}.")
+                   logging.info(f"Received response: {response.json()}")
+                   return response.json()
+           logging.error(f"Failed to send message: HTTP {response.status_code} - {response.text}")
+           st.error(f"Failed to send message: HTTP {response.status_code} - {response.text}")
+           return None
+       except requests.exceptions.RequestException as e:
+           logging.error(f"Error sending message: {str(e)}")
+           st.error(f"Error sending message: {str(e)}")
+           return None
 
 def get_analytics():
     try:
@@ -498,10 +500,10 @@ def main_page():
                         st.session_state.messages.append({
                             "role": "assistant",
                             "content": response.get('response', 'Processing...'),
-                            "intent": response.get('intent'),
-                            "case_id": response.get('case_id'),
-                            "status": response.get('status'),
-                            "timestamp": response.get('timestamp', datetime.now(pytz.timezone('Asia/Kolkata')).isoformat())
+                            "intent": response.get('intent', 'None'),
+                            "case_id": response.get('case_id', None),
+                            "status": response.get('status', 'Processing'),
+                            "timestamp": datetime.now(pytz.timezone('Asia/Kolkata')).isoformat()
                         })
 
     # Main layout with two columns (chat + customer info/analytics)
@@ -521,11 +523,13 @@ def main_page():
                 with st.chat_message(message["role"]):
                     st.markdown(f"**{message['role'].capitalize()}** ({message['timestamp']}):")
                     st.write(message["content"])
-                    if message["role"] == "assistant" and "intent" in message:
-                        st.markdown(f"**Detected Intent**: {message['intent']}")
-                    if message.get("case_id"):
-                        st.markdown(f"**Case ID**: {message['case_id']}")
-                        st.markdown(f"**Status**: {message.get('status', 'Processing')}")
+                    if message["role"] == "assistant":
+                        if message.get("intent"):
+                            st.markdown(f"**Detected Intent**: {message['intent']}")
+                        if message.get("case_id"):
+                            st.markdown(f"**Case ID**: {message['case_id']}")
+                        if message.get("status"):
+                            st.markdown(f"**Status**: {message['status']}")
 
             # Chat input and file upload with form
             with st.form(key="chat_form", clear_on_submit=True):
@@ -567,7 +571,7 @@ def main_page():
                                     if 'reference_id' in response:
                                         st.info(f"📋 Reference ID: {response['reference_id']}")
                                 elif response.get('status') == 'escalated':
-                                    st.warning(f"⚠️ {response['message']}")
+                                    st.warning(f"⚠️ {response.get('message')}")
                                     if 'case_id' in response or 'reference_id' in response:
                                         st.info(f"📋 Case Reference: {response.get('case_id', response.get('reference_id'))}")
                                 if 'validation_details' in response:
@@ -578,33 +582,35 @@ def main_page():
                                 st.session_state.messages.append({
                                     "role": "assistant",
                                     "content": "Failed to process your request. Please try again or contact support.",
+                                    "intent": "ERROR",
+                                    "status": "error",
                                     "timestamp": datetime.now(pytz.timezone('Asia/Kolkata')).isoformat()
                                 })
                     elif prompt:
                         response = send_message(prompt, customer_id)
-                        if response and isinstance(response, list) and len(response) > 0:
-                            # Check if the first element is a dictionary and handle the error case
-                            if isinstance(response[0], dict) and 'detail' in response[0]:
-                                st.session_state.messages.append({
-                                    "role": "assistant",
-                                    "content": response[0].get('detail', 'Processing...'),
-                                    "timestamp": datetime.now(pytz.timezone('Asia/Kolkata')).isoformat()
-                                })
-                            else:
-                                # Assume the first element is a dictionary with the expected keys if not an error
-                                response_dict = response[0] if isinstance(response[0], dict) else {}
-                                st.session_state.messages.append({
-                                    "role": "assistant",
-                                    "content": response_dict.get('response', 'Processing...'),
-                                    "intent": response_dict.get('intent'),
-                                    "case_id": response_dict.get('case_id'),
-                                    "status": response_dict.get('status'),
-                                    "timestamp": response_dict.get('timestamp', datetime.now(pytz.timezone('Asia/Kolkata')).isoformat())
-                                })
+                        if response:
+                            st.session_state.messages.append({
+                                "role": "assistant",
+                                "content": response.get('response', 'Processing...'),
+                                "intent": response.get('intent', 'None'),
+                                "case_id": response.get('case_id', None),
+                                "status": response.get('status', 'Processing'),
+                                "timestamp": datetime.now(pytz.timezone('Asia/Kolkata')).isoformat()
+                            })
+                            if response.get('status') == 'resolved':
+                                st.success(f"✅ {response.get('response')}")
+                            elif response.get('status') == 'escalated':
+                                st.warning(f"⚠️ {response.get('response')}")
+                                if response.get('case_id'):
+                                    st.info(f"📋 Case ID: {response.get('case_id')}")
+                            elif response.get('status') == 'pending_image':
+                                st.info(f"ℹ️ {response.get('response')}")
                         else:
                             st.session_state.messages.append({
                                 "role": "assistant",
                                 "content": "Failed to process your request. Please try again or contact support.",
+                                "intent": "ERROR",
+                                "status": "error",
                                 "timestamp": datetime.now(pytz.timezone('Asia/Kolkata')).isoformat()
                             })
                     st.rerun()

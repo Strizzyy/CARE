@@ -88,9 +88,9 @@
     {
       "order_id": "ORD005",
       "customer_id": "WM003",
-      "status": "cancelled",
+      "status": "delivered",
       "order_date": "2024-07-12",
-      "delivery_date": null,
+      "delivery_date": "2024-07-14",
       "expected_delivery": "2024-07-14",
       "items": [
         {"name": "Laptop HP Pavilion", "price": 45000.00, "quantity": 1, "category": "Electronics"}
@@ -100,7 +100,7 @@
       "delivery_address": "Apartment 5B, Tech Park Road, Bangalore - 560001",
       "tracking_id": "TRK005",
       "delivery_partner": "BlueDart",
-      "cancellation_reason": "Customer requested cancellation"
+      "damage_reported": true
     },
     {
       "order_id": "ORD006",
@@ -120,4 +120,4 @@
       "delivery_partner": "Walmart Spark"
     }
   ]
-}   
+}

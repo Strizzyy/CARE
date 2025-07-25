@@ -1,3 +1,4 @@
+# fast_api.py
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -8,7 +9,7 @@ from resolution_engine import ResolutionAgent
 from data_handler import MongoDBHandler
 from dotenv import load_dotenv
 import uuid
-import re  # Added for regex
+import re
 import logging
 import os
 
@@ -44,7 +45,7 @@ async def startup_event():
     global data_handler, nlu, subscription_manager, resolution_agent
     data_handler = MongoDBHandler(MONGODB_URI)
     await data_handler.initialize()
-    nlu = NLUPipeline(GROQ_API_KEY, MONGODB_URI)
+    nlu = NLUPipeline(GROQ_API_KEY, data_handler)
     subscription_manager = SubscriptionManager(data_handler)
     resolution_agent = ResolutionAgent(data_handler, GEMINI_API_KEY)
 
@@ -113,43 +114,142 @@ async def get_customer_info(customer_id: str):
         logging.error(f"Error in get_customer_info: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
     try:
         customer_id = request.customer_id
         message = request.message
         logging.info(f"Processing chat for {customer_id}: {message}")
-        # Example: Fetch order status
-        if "where is my order" in message.lower():
-            # Extract order ID using regex
-            order_id_match = re.search(r'ORD\d{3}', message)
-            order_id = order_id_match.group() if order_id_match else None
-            logging.info(f"Extracted order_id: {order_id}")
-            if not order_id:
-                return {"response": "Please provide a valid order ID (e.g., ORD001).", "status": "not_found"}
-            order = await data_handler.get_order(order_id)
-            logging.info(f"Order data: {order}")
-            if not order:
-                return {"response": f"Order {order_id} not found.", "status": "not_found"}
-            return {"response": f"Order {order_id} is {order.get('status', 'being processed')}.", "status": "in_progress"}
-        return {"response": "I can help with that!", "status": "ok"}
+        
+        # Verify customer exists
+        customer = await data_handler.get_customer(customer_id)
+        if not customer:
+            case_id = str(uuid.uuid4())
+            await data_handler.add_escalation(case_id, customer_id, f"Customer not found. Message: {message}")
+            return {
+                "response": f"Customer ID {customer_id} not found. Please verify your customer ID.",
+                "intent": "ERROR",
+                "status": "escalated",
+                "case_id": case_id
+            }
+        
+        # Classify intent using NLUPipeline
+        intent = await nlu.classify_intent(message)
+        logging.info(f"Detected intent: {intent}")
+        
+        # Generate initial response
+        response = await nlu.generate_response(intent, message, customer_id)
+        
+        # Handle specific intents
+        if intent == "REFUND_REQUEST":
+            order_id = nlu.extract_order_id(message)
+            if order_id:
+                order = await data_handler.get_order(order_id)
+                if order:
+                    return {
+                        "response": f"Please upload an image of the damaged item for order {order_id} to process your refund.",
+                        "intent": intent,
+                        "status": "pending_image",
+                        "order_id": order_id
+                    }
+                else:
+                    case_id = str(uuid.uuid4())
+                    await data_handler.add_escalation(case_id, customer_id, message)
+                    return {
+                        "response": f"Order {order_id} not found. Your request has been escalated for manual review.",
+                        "intent": intent,
+                        "status": "escalated",
+                        "case_id": case_id
+                    }
+            else:
+                case_id = str(uuid.uuid4())
+                await data_handler.add_escalation(case_id, customer_id, message)
+                return {
+                    "response": "Please provide a valid order ID (e.g., ORD001) for your refund request.",
+                    "intent": intent,
+                    "status": "escalated",
+                    "case_id": case_id
+                }
+        
+        elif intent == "ORDER_STATUS":
+            order_id = nlu.extract_order_id(message)
+            if order_id:
+                order = await data_handler.get_order(order_id)
+                if order:
+                    return {
+                        "response": f"Order {order_id} is {order.get('status', 'being processed')}. Expected delivery: {order.get('expected_delivery', 'N/A')}.",
+                        "intent": intent,
+                        "status": "resolved"
+                    }
+                else:
+                    case_id = str(uuid.uuid4())
+                    await data_handler.add_escalation(case_id, customer_id, message)
+                    return {
+                        "response": f"Order {order_id} not found. Your request has been escalated for manual review.",
+                        "intent": intent,
+                        "status": "escalated",
+                        "case_id": case_id
+                    }
+            else:
+                case_id = str(uuid.uuid4())
+                await data_handler.add_escalation(case_id, customer_id, message)
+                return {
+                    "response": "Please provide a valid order ID (e.g., ORD001) to check your order status.",
+                    "intent": intent,
+                    "status": "escalated",
+                    "case_id": case_id
+                }
+        
+        elif intent == "PAYMENT_PROBLEM":
+            failed_payments = await data_handler.get_failed_payments(customer_id)
+            if failed_payments:
+                case_id = str(uuid.uuid4())
+                await data_handler.add_escalation(case_id, customer_id, message)
+                return {
+                    "response": f"Found {len(failed_payments)} failed payment(s). Your request has been escalated for review.",
+                    "intent": intent,
+                    "status": "escalated",
+                    "case_id": case_id
+                }
+            return {
+                "response": "No payment issues found for your account.",
+                "intent": intent,
+                "status": "resolved"
+            }
+        
+        # For other intents, return LLM-generated response
+        return {
+            "response": response,
+            "intent": intent,
+            "status": "resolved" if intent != "GENERAL_INQUIRY" else "pending"
+        }
     except Exception as e:
         logging.error(f"Error in chat_endpoint for customer {customer_id}: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail="I apologize, but I encountered an error. Please try again.")
-
-@app.post("/subscription")
-async def create_subscription(request: SubscriptionRequest):
-    try:
-        if not all([request.customer_id, request.items, request.delivery_date]):
-            logging.warning("Create subscription called with missing fields.")
-            raise HTTPException(status_code=400, detail="Missing required fields")
-        subscription = await subscription_manager.create_subscription(
-            request.customer_id, request.items, request.delivery_date, request.subscription_type
-        )
-        logging.info(f"Subscription {subscription['subscription_id']} created for customer {request.customer_id}.")
+        case_id = str(uuid.uuid4())
+        await data_handler.add_escalation(case_id, customer_id, f"Error: {str(e)}. Message: {message}")
         return {
-            "message": f"Subscription {subscription['subscription_id']} created successfully",
-            "subscription": subscription
+            "response": f"I apologize, but I encountered an error: {str(e)}. Your request has been escalated for review.",
+            "intent": "ERROR",
+            "status": "escalated",
+            "case_id": case_id
+        }
+        
+        # For other intents, return LLM-generated response
+        return {
+            "response": response,
+            "intent": intent,
+            "status": "resolved" if intent != "GENERAL_INQUIRY" else "pending"
+        }
+    except Exception as e:
+        logging.error(f"Error in chat_endpoint for customer {customer_id}: {str(e)}", exc_info=True)
+        case_id = str(uuid.uuid4())
+        await data_handler.add_escalation(case_id, customer_id, f"Error: {str(e)}. Message: {message}")
+        return {
+            "response": "I apologize, but I encountered an error. Your request has been escalated for review.",
+            "intent": "ERROR",
+            "status": "escalated",
+            "case_id": case_id
         }
     except Exception as e:
         logging.error(f"Error in create_subscription: {e}")
@@ -221,14 +321,13 @@ async def get_analytics():
     except Exception as e:
         logging.error(f"Error in get_analytics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
 @app.post("/validate")
 async def validate_request(file: UploadFile = File(...), message: str = Form(""), customer_id: str = Form("WM001")):
     try:
         logging.info(f"Processing validation request for customer {customer_id} with file {file.filename}")
         contents = await file.read()
         case_id = str(uuid.uuid4())
-        order_id = await resolution_agent._extract_order_id(message)  # Ensure this is async if needed
+        order_id =await resolution_agent._extract_order_id(message)
         refund_amount = await data_handler.get_order_amount(order_id) if order_id else 50.0
         validation_result = await resolution_agent.process_request(
             intent="REFUND_REQUEST",
@@ -252,12 +351,15 @@ async def validate_request(file: UploadFile = File(...), message: str = Form("")
     except Exception as e:
         logging.error(f"Error in validate_request: {e}")
         ref_id = f"REF-ERR-{datetime.now().strftime('%Y%m%d%H%M%S')}"
+        case_id = str(uuid.uuid4())
+        await data_handler.add_escalation(case_id, customer_id, f"Error: {str(e)}. Message: {message}")
         return {
             "status": "escalated",
             "message": f"We apologize, but we encountered an issue processing your request: {str(e)}. Escalated for review.",
             "category": "Refund Request",
             "priority": "High",
-            "reference_id": ref_id
+            "reference_id": ref_id,
+            "case_id": case_id
         }
 
 if __name__ == "__main__":
