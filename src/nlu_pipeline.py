@@ -10,7 +10,7 @@ import logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.FileHandler("nlu_pipeline.log"), logging.StreamHandler()]
+    handlers=[logging.FileHandler("logs/nlu_pipeline.log"), logging.StreamHandler()]
 )
 
 class NLUPipeline:

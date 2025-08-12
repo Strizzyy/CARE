@@ -8,30 +8,21 @@ from data_handler import MongoDBHandler
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.FileHandler("subscription_manager.log"), logging.StreamHandler()]
+    handlers=[logging.FileHandler("logs/subscription_manager.log"), logging.StreamHandler()]
 )
 
 class SubscriptionManager:
     def __init__(self, data_handler: MongoDBHandler):
         self.data_handler = data_handler
 
-    async def create_subscription(self, customer_id: str, items: List[Dict], delivery_date: str, subscription_type: str) -> Dict:
+    async def create_subscription(self, subscription_data: Dict) -> Dict:
         """Create a new subscription for a customer."""
+        customer_id = subscription_data.get("customer_id")
         logging.info(f"Creating subscription for customer {customer_id}")
         try:
-            subscription_id = f"SUB{str(uuid.uuid4())[:8]}"
-            subscription = {
-                "subscription_id": subscription_id,
-                "customer_id": customer_id,
-                "items": items,
-                "delivery_date": delivery_date,
-                "subscription_type": subscription_type,
-                "status": "active",
-                "created_at": datetime.now().isoformat()
-            }
-            await self.data_handler.add_subscription(subscription)
-            logging.info(f"Subscription {subscription_id} created successfully")
-            return subscription
+            await self.data_handler.add_subscription(subscription_data)
+            logging.info(f"Subscription {subscription_data['subscription_id']} created successfully")
+            return subscription_data
         except Exception as e:
             logging.error(f"Error creating subscription for customer {customer_id}: {e}")
             raise

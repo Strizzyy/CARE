@@ -1,0 +1,17 @@
+streamlit
+fastapi
+uvicorn
+groq
+requests
+pymongo
+python-dateutil
+plotly
+httpx
+python-dotenv
+google-generativeai
+Pillow
+langgraph
+langchain-core
+tenacity
+motor
+python-multipart

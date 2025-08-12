@@ -12,13 +12,20 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:5000")
+# Determine API base URL based on environment
+if os.getenv("SPACE_ID"):  # Running on Hugging Face Spaces
+    API_BASE_URL = "http://localhost:7860"  # Internal communication
+else:
+    API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:5000")  # Local development
+
+# Ensure logs directory exists
+os.makedirs("logs", exist_ok=True)
 
 # Logging setup
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.FileHandler("streamlit_app.log"), logging.StreamHandler()]
+    handlers=[logging.FileHandler("logs/streamlit_app.log"), logging.StreamHandler()]
 )
 
 # Page configuration
@@ -443,6 +450,22 @@ def get_subscription_notifications(customer_id):
         st.error(f"Error: {e}")
         return {"notifications": []}
 
+def show_navigation():
+    """Show navigation options"""
+    st.sidebar.markdown("---")
+    st.sidebar.header("🔗 Navigation")
+    
+    # Show different URLs based on environment
+    if os.getenv("SPACE_ID"):  # Running on Hugging Face Spaces
+        base_url = "https://care-engine.streamlit.app"
+        st.sidebar.markdown(f"**🎨 Customer Interface**: [Main App]({base_url})")
+        st.sidebar.markdown(f"**👨‍💼 Human Agent Dashboard**: [Agent Portal]({base_url}:8502)")
+        st.sidebar.markdown(f"**📊 API Documentation**: [API Docs]({base_url}:7860/docs)")
+    else:  # Local development
+        st.sidebar.markdown("**🎨 Customer Interface**: http://localhost:8501")
+        st.sidebar.markdown("**👨‍💼 Human Agent Dashboard**: http://localhost:8502")
+        st.sidebar.markdown("**📊 API Documentation**: http://localhost:7860/docs")
+
 def main_page():
     # Header
     st.markdown("""
@@ -452,6 +475,9 @@ def main_page():
     </div>
     """, unsafe_allow_html=True)
 
+    # Show navigation
+    show_navigation()
+    
     # Sidebar for customer selection
     with st.sidebar:
         st.header("Customer Selection")
@@ -543,7 +569,7 @@ def main_page():
 
                 if submit_button and customer_id:
                     # Add user message to history
-                    user_content = prompt or ("Image uploaded" if uploaded_file else prompt)
+                    user_content = prompt or ("Refund request with image" if uploaded_file else prompt)
                     st.session_state.messages.append({
                         "role": "user",
                         "content": user_content,

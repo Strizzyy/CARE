@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.FileHandler("data_handler.log"), logging.StreamHandler()]
+    handlers=[logging.FileHandler("logs/data_handler.log"), logging.StreamHandler()]
 )
 
 class MongoDBHandler:
@@ -140,10 +140,31 @@ class MongoDBHandler:
         doc = await self.collections["escalations"].find_one({"case_id": case_id})
         return self._convert_objectid(doc) if doc else None
 
+    async def get_customer_escalations(self, customer_id: str) -> List[Dict]:
+        cursor = self.collections["escalations"].find({"customer_id": customer_id})
+        docs = [doc async for doc in cursor]
+        return [self._convert_objectid(doc) for doc in docs]
+
+    async def get_all_escalations(self) -> List[Dict]:
+        cursor = self.collections["escalations"].find()
+        docs = [doc async for doc in cursor]
+        return [self._convert_objectid(doc) for doc in docs]
+
     async def update_escalation_status(self, case_id: str, status: str) -> bool:
         result = await self.collections["escalations"].update_one(
             {"case_id": case_id},
-            {"$set": {"status": status}}
+            {"$set": {"status": status, "resolved_at": datetime.now().isoformat()}}
+        )
+        return result.modified_count > 0
+
+    async def resolve_escalation(self, case_id: str, resolution: Dict) -> bool:
+        result = await self.collections["escalations"].update_one(
+            {"case_id": case_id},
+            {"$set": {
+                "status": "resolved",
+                "resolution": resolution,
+                "resolved_at": datetime.now().isoformat()
+            }}
         )
         return result.modified_count > 0
 
